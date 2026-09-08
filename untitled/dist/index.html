@@ -108,12 +108,29 @@
     let allProducts = [];
     let cart = [];
     document.addEventListener('DOMContentLoaded', () => { fetchProducts(); });
-    async function fetchProducts() {
-      try {
-        const res = await fetch('/api/products');
-        allProducts = await res.json();
-        renderProducts(allProducts);
-      } catch (err) { console.error('Failed to load products', err); }
+async function fetchProducts() {
+  // Real iPhones with your prices in KSh
+  allProducts = [
+    { id: 1, name: "iPhone 15 Pro Max 256GB", price: 185000, category: "iphones", image: "https://images.unsplash.com/photo-1695044781337-1d8c85e5f6f5?w=500" },
+    { id: 2, name: "iPhone 15 Pro 128GB", price: 165000, category: "iphones", image: "https://images.unsplash.com/photo-1695044781337-1d8c85e5f6f5?w=500" },
+    { id: 3, name: "iPhone 14 Pro Max 256GB", price: 155000, category: "iphones", image: "https://images.unsplash.com/photo-1678911820864-e2c567c655d7?w=500" },
+    { id: 4, name: "iPhone 14 128GB", price: 115000, category: "iphones", image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500" },
+    { id: 5, name: "iPhone 13 128GB", price: 85000, category: "iphones", image: "https://images.unsplash.com/photo-1632661674596-d8441a0dd2a8?w=500" },
+    { id: 6, name: "iPad Pro 12.9 M2", price: 145000, category: "tablets", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500" },
+    { id: 7, name: "Apple Watch Series 9", price: 55000, category: "watches", image: "https://images.unsplash.com/photo-1555421689-3f034debb7a6?w=500" },
+    { id: 8, name: "Samsung S24 Ultra", price: 135000, category: "phones", image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500" }
+  ];
+  renderProducts(allProducts);
+  
+  // Still try API if it ever works
+  try {
+    const res = await fetch('/api/products');
+    if(res.ok){
+      allProducts = await res.json();
+      renderProducts(allProducts);
+    }
+  } catch(e){}
+}
     }
     function renderProducts(products) {
       const container = document.getElementById('product-grid');
