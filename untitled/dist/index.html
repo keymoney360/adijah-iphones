@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adijah iPhones | Official Store</title>
+  <style>
+    /* Dark & Orange Color Scheme */
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --accent-orange: #ff6600;
+      --accent-orange-hover: #ff8533;
+      --text-main: #ffffff;
+      --text-sub: #b0b0b0;
+      --border-dark: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header & Navigation */
+    header {
+      background-color: #080808;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 2px solid var(--accent-orange);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .logo span {
+      color: var(--accent-orange);
+    }
+
+    .categories {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border-dark);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      background-color: var(--accent-orange);
+      border-color: var(--accent-orange);
+      color: #000000;
+      font-weight: bold;
+    }
+
+    .cart-btn {
+      background-color: var(--accent-orange);
+      color: #000000;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
+    }
+
+    .cart-btn:hover {
+      background-color: var(--accent-orange-hover);
+    }
+
+    /* Hero Banner */
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem;
+      background: linear-gradient(180deg, #000000 0%, var(--bg-color) 100%);
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero h1 span {
+      color: var(--accent-orange);
+    }
+
+    .hero p {
+      color: var(--text-sub);
+    }
+
+    /* Main Container & Product Grid */
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-orange);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-price {
+      color: var(--accent-orange);
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .btn-add-cart {
+      margin-top: auto;
+      background-color: var(--accent-orange);
+      color: #000000;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-add-cart:hover {
+      background-color: var(--accent-orange-hover);
+    }
+
+    /* Sliding Cart Drawer */
+    .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 350px;
+      height: 100%;
+      background-color: #181818;
+      border-left: 2px solid var(--accent-orange);
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      transition: right 0.3s ease;
+      z-index: 200;
+    }
+
+    .cart-drawer.open {
+      right: 0;
+    }
+
+    .cart-header {
+      padding: 1.2rem;
+      border-bottom: 1px solid var(--border-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cart-items {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #2b2b2b;
+    }
+
+    .cart-footer {
+      padding: 1.2rem;
+      border-top: 1px solid var(--border-dark);
+    }
+
+    .cart-total {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .btn-checkout {
+      width: 100%;
+      background-color: var(--accent-orange);
+      color: #000000;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--text-main);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Modal Overlay */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 300;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 10px;
+      border: 1px solid var(--accent-orange);
+      width: 90%;
+      max-width: 420px;
+      position: relative;
+    }
+
+    .modal-content form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .modal-content input {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-dark);
+      background: #121212;
+      color: #ffffff;
+    }
+
+    .btn-submit {
+      background: var(--accent-orange);
+      color: #000000;
+      border: none;
+      padding: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background-color: #080808;
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border-dark);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="logo">ADIJAH <span>IPHONES</span></div>
+    <nav class="categories">
+      <button class="nav-btn active" onclick="filterCategory('all', event)">All Products</button>
+      <button class="nav-btn" onclick="filterCategory('iphones', event)">iPhones</button>
+      <button class="nav-btn" onclick="filterCategory('tablets', event)">Tablets</button>
+      <button class="nav-btn" onclick="filterCategory('watches', event)">Watches</button>
+      <button class="nav-btn" onclick="filterCategory('phones', event)">Other Phones</button>
+    </nav>
+    <button class="cart-btn" onclick="toggleCart()">
+      🛒 Cart (<span id="cart-count">0</span>)
+    </button>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="hero">
+    <h1>Welcome to <span>Adijah iPhones</span></h1>
+    <p>Your ultimate destination for genuine iPhones, Tablets, Watches, and Smartphones.</p>
+  </section>
+
+  <!-- Product Display -->
+  <main class="container">
+    <div class="product-grid" id="product-grid"></div>
+  </main>
+
+  <!-- Sliding Cart Drawer -->
+  <aside class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h2>Your Cart</h2>
+      <button class="btn-close" onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span>$<span id="cart-total-price">0</span></span>
+      </div>
+      <button class="btn-checkout" onclick="openCheckoutModal()">Proceed to Checkout</button>
+    </div>
+  </aside>
+
+  <!-- Checkout Modal -->
+  <div class="modal" id="checkout-modal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Complete Order</h2>
+        <button class="btn-close" onclick="closeCheckoutModal()">✕</button>
+      </div>
+      <form id="checkout-form" onsubmit="submitOrder(event)">
+        <label>Full Name</label>
+        <input type="text" id="cust-name" required placeholder="John Doe">
+        
+        <label>Phone Number</label>
+        <input type="tel" id="cust-phone" required placeholder="+254 700 000 000">
+
+        <label>Delivery Address</label>
+        <input type="text" id="cust-address" required placeholder="City / Building / Street">
+
+        <button type="submit" class="btn-submit">Confirm Order</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Adijah iPhones. All Rights Reserved.</p>
+  </footer>
+
+  <!-- Frontend Logic -->
+  <script>
+    let allProducts = [];
+    let cart = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchProducts();
+    });
+
+    async function fetchProducts() {
+      try {
+        const res = await fetch('/api/products');
+        allProducts = await res.json();
+        renderProducts(allProducts);
+      } catch (err) {
+        console.error('Failed to load products', err);
+      }
+    }
+
+    function renderProducts(products) {
+      const container = document.getElementById('product-grid');
+      container.innerHTML = '';
+
+      products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${p.image}" alt="${p.name}">
+          <div class="product-info">
+            <h3 class="product-title">${p.name}</h3>
+            <div class="product-price">$${p.price}</div>
+            <button class="btn-add-cart" onclick="addToCart(${p.id})">Add to Cart</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterCategory(category, e) {
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      if(e) e.target.classList.add('active');
+
+      if (category === 'all') {
+        renderProducts(allProducts);
+      } else {
+        const filtered = allProducts.filter(p => p.category === category);
+        renderProducts(filtered);
+      }
+    }
+
+    function addToCart(productId) {
+      const product = allProducts.find(p => p.id === productId);
+      cart.push(product);
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      document.getElementById('cart-count').innerText = cart.length;
+      const itemsContainer = document.getElementById('cart-items');
+      itemsContainer.innerHTML = '';
+
+      let total = 0;
+      cart.forEach((item) => {
+        total += item.price;
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <span>${item.name}</span>
+          <span>$${item.price}</span>
+        `;
+        itemsContainer.appendChild(div);
+      });
+
+      document.getElementById('cart-total-price').innerText = total;
+    }
+
+    function toggleCart() {
+      document.getElementById('cart-drawer').classList.toggle('open');
+    }
+
+    function openCheckoutModal() {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      document.getElementById('checkout-modal').style.display = 'flex';
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').style.display = 'none';
+    }
+
+    async function submitOrder(e) {
+      e.preventDefault();
+      
+      const customer = {
+        name: document.getElementById('cust-name').value,
+        phone: document.getElementById('cust-phone').value,
+        address: document.getElementById('cust-address').value
+      };
+
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+      try {
+        const response = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customer, items: cart, total })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          alert(`Order placed successfully!\nOrder Reference: ${result.orderId}`);
+          cart = [];
+          updateCartUI();
+          closeCheckoutModal();
+          toggleCart();
+        }
+      } catch (err) {
+        alert('Checkout failed. Make sure your Express server is running.');
+      }
+    }
+  </script>
+</body>
+</html>

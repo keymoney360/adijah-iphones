@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "iPhone 15 Pro Max",
+    "category": "iphones",
+    "price": 700,
+    "image": "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": 2,
+    "name": "iPhone 14",
+    "category": "iphones",
+    "price": 699,
+    "image": "https://images.unsplash.com/photo-1663499482523-1c0c1bae4ce1?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": 3,
+    "name": "iPad Pro 12.9\"",
+    "category": "tablets",
+    "price": 1099,
+    "image": "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": 4,
+    "name": "Apple Watch Ultra 2",
+    "category": "watches",
+    "price": 799,
+    "image": "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=400&q=80"
+  }
+]

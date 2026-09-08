@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Adijah iPhones - Kenya</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#0f0f0f;color:#fff}
+header{background:#000;border-bottom:2px solid #ffb400;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:10}
+.logo{font-weight:800;font-size:20px}.logo span{color:#ffb400}
+nav{display:flex;gap:8px}
+nav button{background:#222;color:#fff;border:none;padding:8px 14px;border-radius:20px;cursor:pointer;font-size:13px}
+nav button.active{background:#ffb400;color:#000;font-weight:700}
+.cart-btn{background:#ffb400;color:#000;border:none;padding:8px 16px;border-radius:20px;font-weight:700;cursor:pointer}
+.hero{text-align:center;padding:30px 20px 10px}
+.hero h1{font-size:32px;font-weight:800}.hero h1 span{color:#ffb400}
+.hero p{color:#aaa;margin-top:8px;font-size:14px}
+#products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;padding:20px}
+.card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;overflow:hidden}
+.card img{width:100%;height:180px;object-fit:cover;background:#222}
+.card-body{padding:12px}
+.card-body h3{font-size:15px;margin-bottom:6px}
+.price{color:#ffb400;font-weight:800;margin-bottom:10px}
+.card-body button{width:100%;background:#ffb400;color:#000;border:none;padding:10px;border-radius:8px;font-weight:700;cursor:pointer}
+#cartModal{position:fixed;inset:0;background:#000c;display:none;justify-content:flex-end;z-index:99}
+#cartBox{background:#111;width:100%;max-width:380px;height:100%;padding:20px;overflow:auto;border-left:2px solid #ffb400}
+.cart-item{display:flex;gap:10px;margin:10px 0;border-bottom:1px solid #222;padding-bottom:10px}
+.cart-item img{width:50px;height:50px;border-radius:6px;object-fit:cover}
+.checkout input{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #333;background:#1e1e1e;color:#fff}
+.checkout button{width:100%;background:#ffb400;color:#000;padding:13px;border:none;border-radius:10px;font-weight:800;margin-top:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">ADIJAH <span>IPHONES</span></div>
+<nav>
+<button class="active" onclick="filterCat('all',this)">All Products</button>
+<button onclick="filterCat('iphones',this)">iPhones</button>
+<button onclick="filterCat('tablets',this)">Tablets</button>
+<button onclick="filterCat('watches',this)">Watches</button>
+<button onclick="filterCat('other',this)">Other Phones</button>
+</nav>
+<button class="cart-btn" onclick="openCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+</header>
+<div class="hero">
+<h1>Welcome to <span>Adijah iPhones</span></h1>
+<p>Your ultimate destination for genuine iPhones, Tablets, Watches in Kenya.</p>
+</div>
+<div id="products"></div>
+<div id="cartModal" onclick="if(event.target==this)closeCart()"><div id="cartBox">
+<h2 style="display:flex;justify-content:space-between">Your Cart <span onclick="closeCart()" style="cursor:pointer">✕</span></h2>
+<div id="cartItems"></div>
+<h3 id="cartTotal" style="margin:15px 0;color:#ffb400"></h3>
+<div class="checkout">
+<input id="c_name" placeholder="Full Name">
+<input id="c_phone" placeholder="Phone - 07XX XXX XXX">
+<input id="c_loc" placeholder="Location - Nairobi, Mombasa...">
+<button onclick="checkout()">Place Order</button>
+</div>
+</div></div>
+<script>
+let products=[],filtered=[],cart=JSON.parse(localStorage.getItem('adijah_cart')||'[]');
+async function load(){let r=await fetch('/api/products');products=await r.json();filtered=products;render()}
+function render(){
+ let html='';
+ filtered.forEach(p=>{
+  html+=`<div class="card">
+   <img src="${p.image}" onerror="this.src='https://via.placeholder.com/400?text=No+Image'">
+   <div class="card-body">
+    <h3>${p.name}</h3>
+    <div class="price">KSh ${Number(p.price).toLocaleString()}</div>
+    <button onclick="addToCart(${p.id})">Add to Cart</button>
+   </div>
+  </div>`;
+ });
+ document.getElementById('products').innerHTML=html;
+}
+function filterCat(cat,btn){
+ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+ btn.classList.add('active');
+ filtered=cat==='all'?products:products.filter(p=>(p.category||'').toLowerCase().includes(cat));
+ render();
+}
+function addToCart(id){let p=products.find(x=>x.id==id);let f=cart.find(x=>x.id==id);if(f)f.qty++;else cart.push({...p,qty:1});saveCart();openCart()}
+function saveCart(){localStorage.setItem('adijah_cart',JSON.stringify(cart));document.getElementById('cartCount').innerText=cart.reduce((a,b)=>a+b.qty,0)}
+function openCart(){renderCart();document.getElementById('cartModal').style.display='flex'}
+function closeCart(){document.getElementById('cartModal').style.display='none'}
+function renderCart(){
+ let h='';let total=0;
+ cart.forEach((c,i)=>{
+  total+=c.price*c.qty;
+  h+=`<div class="cart-item"><img src="${c.image}"><div style="flex:1"><div style="font-size:13px">${c.name}</div><div style="color:#ffb400;font-size:13px">KSh ${Number(c.price).toLocaleString()} x ${c.qty}</div></div><button onclick="removeItem(${i})" style="background:none;border:none;color:#f55;cursor:pointer">✕</button></div>`;
+ });
+ document.getElementById('cartItems').innerHTML=h||'Cart empty';
+ document.getElementById('cartTotal').innerText=total?`Total: KSh ${total.toLocaleString()}`:'';
+}
+function removeItem(i){cart.splice(i,1);saveCart();renderCart()}
+async function checkout(){
+ let name=document.getElementById('c_name').value,phone=document.getElementById('c_phone').value,loc=document.getElementById('c_loc').value;
+ if(!name||!phone||!cart.length){alert('Fill name, phone');return;}
+ let total=cart.reduce((a,b)=>a+b.price*b.qty,0);
+ let res=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer:{name,phone,location:loc},items:cart,total})});
+ let data=await res.json();
+ if(data.success){alert('Order '+data.orderId+' placed!');cart=[];saveCart();closeCart();}
+}
+saveCart();load();
+</script>
+</body>
+</html>

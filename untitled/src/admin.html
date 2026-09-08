@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Adijah Admin</title>
+<style>
+body{font-family:Arial;background:#0f0f0f;color:#fff;padding:20px}
+input,button,select{padding:10px;margin:5px;border-radius:6px;border:none}
+input,select{width:200px;background:#222;color:#fff;border:1px solid #333}
+.card{background:#1e1e1e;padding:15px;border-radius:10px;margin:10px 0;border:1px solid #333}
+button{background:#ffb400;color:#000;cursor:pointer;font-weight:bold}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+td,th{padding:8px;border-bottom:1px solid #333;text-align:left}
+th{color:#ffb400}
+img{width:50px;height:50px;object-fit:cover;border-radius:6px}
+#panel{display:none}
+.green{width:100%;background:#00c853;color:#fff;padding:15px;font-size:16px;margin-top:20px;border-radius:10px}
+</style>
+</head>
+<body>
+<h1>ADIJAH Admin - Products</h1>
+<div id="login">
+<input type="password" id="pwd" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="msg"></p>
+</div>
+
+<div id="panel">
+<div class="card">
+<h3>Add New Product</h3>
+<input id="n_name" placeholder="Name - iPhone 15">
+<input id="n_price" type="number" placeholder="Price KSh - 185000">
+<input id="n_cat" placeholder="Category - iphones">
+<input id="n_image" placeholder="Image URL" style="width:350px">
+<button onclick="addProduct()" style="background:#ff6a00;color:#fff">+ Add Product</button>
+</div>
+
+<table>
+<thead><tr><th>Img</th><th>Name</th><th>Price (KSh)</th><th>Category</th><th>Action</th></tr></thead>
+<tbody id="list"></tbody>
+</table>
+
+<button class="green" onclick="saveAll()">💾 SAVE ALL CHANGES TO WEBSITE</button>
+
+<h2 style="margin-top:30px">Orders</h2>
+<div id="orders"></div>
+</div>
+
+<script>
+let products=[],pwd="";
+async function login(){
+ pwd=document.getElementById('pwd').value;
+ let r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+ if(r.ok){localStorage.setItem('adijah_pwd',pwd);showPanel();}
+ else document.getElementById('msg').innerText="Wrong password";
+}
+async function showPanel(){
+ document.getElementById('login').style.display='none';
+ document.getElementById('panel').style.display='block';
+ pwd=localStorage.getItem('adijah_pwd');
+ let res=await fetch('/api/products');products=await res.json();render();loadOrders();
+}
+function render(){
+ let h="";
+ products.forEach((p,i)=>{
+  h+=`<tr>
+  <td><img src="${p.image}" onerror="this.src='https://via.placeholder.com/50'"></td>
+  <td><input value="${p.name}" onchange="products[${i}].name=this.value" style="width:150px"></td>
+  <td><input type="number" value="${p.price}" onchange="products[${i}].price=Number(this.value)" style="width:100px"></td>
+  <td><input value="${p.category||''}" onchange="products[${i}].category=this.value" style="width:100px"></td>
+  <td><button onclick="products.splice(${i},1);render()" style="background:red;color:#fff">Delete</button></td>
+  </tr>`;
+ });
+ document.getElementById('list').innerHTML=h;
+}
+function addProduct(){
+ if(!document.getElementById('n_name').value)return alert('Enter name');
+ products.push({id:Date.now(),name:document.getElementById('n_name').value,price:Number(document.getElementById('n_price').value)||0,category:document.getElementById('n_cat').value||'iphones',image:document.getElementById('n_image').value});
+ render();
+ document.getElementById('n_name').value='';document.getElementById('n_price').value='';document.getElementById('n_image').value='';
+}
+async function saveAll(){
+ let r=await fetch('/api/admin/products',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':pwd},body:JSON.stringify({products,password:pwd})});
+ alert(r.ok?'Saved! Refresh shop to see changes':'Failed - check password');
+}
+async function loadOrders(){
+ let r=await fetch('/api/admin/orders',{headers:{'x-admin-password':pwd}});
+ let o=await r.json();
+ document.getElementById('orders').innerHTML=o.reverse().map(x=>`<div class="card"><b>${x.id}</b> - ${x.customer.name} (${x.customer.phone}) - KSh ${Number(x.total).toLocaleString()}<br><small>${x.items.map(i=>i.name).join(', ')}</small></div>`).join('') || '<p>No orders yet</p>';
+}
+if(localStorage.getItem('adijah_pwd'))showPanel();
+</script>
+</body>
+</html>
