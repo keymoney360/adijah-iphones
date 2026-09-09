@@ -6,7 +6,7 @@ const path = require('path');
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // allow big images
-
+mongodb+srv://kimaniiangithua_db_user:<db_password>@cluster0.zfamvdh.mongodb.net/?appName=Cluster0
 // 1. CONNECT TO YOUR MONGODB
 const MONGODB_URI = process.env.MONGODB_URI || "PASTE_YOUR_MONGODB_STRING_HERE";
 mongoose.connect(MONGODB_URI)
