@@ -8,86 +8,221 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// MongoDB connection
+// ===============================
+// MONGODB CONNECTION
+// ===============================
+
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-    console.error("❌ MONGODB_URI is not configured");
+  console.error("❌ MONGODB_URI is not set in Render Environment Variables");
 } else {
-    mongoose
-        .connect(MONGODB_URI)
-        .then(() => console.log("✅ MongoDB Connected"))
-        .catch((err) => console.error("❌ MongoDB Error:", err));
+  mongoose
+    .connect(MONGODB_URI)
+    .then(() => {
+      console.log("✅ MongoDB Connected");
+    })
+    .catch((error) => {
+      console.error("❌ MongoDB Connection Error:", error);
+    });
 }
 
-// Product model
+// ===============================
+// PRODUCT MODEL
+// ===============================
+
 const ProductSchema = new mongoose.Schema(
-    {
-        name: { type: String, required: true },
-        price: { type: Number, required: true },
-        category: { type: String, default: "" },
-        image: { type: String, default: "" },
-        description: { type: String, default: "" }
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    { timestamps: true }
+
+    price: {
+      type: Number,
+      required: true,
+    },
+
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    image: {
+      type: String,
+      default: "",
+    },
+
+    description: {
+      type: String,
+      default: "",
+    },
+  },
+  {
+    timestamps: true,
+  }
 );
 
 const Product = mongoose.model("Product", ProductSchema);
 
-// Get all products
+// ===============================
+// GET ALL PRODUCTS
+// ===============================
+
 app.get("/api/products", async (req, res) => {
-    try {
-        const products = await Product.find().sort({ createdAt: -1 });
-        res.json(products);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to load products" });
-    }
+  try {
+    const products = await Product.find().sort({ createdAt: -1 });
+
+    res.json(products);
+  } catch (error) {
+    console.error("GET PRODUCTS ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to load products",
+    });
+  }
 });
 
-// Add product
+// ===============================
+// ADD PRODUCT
+// ===============================
+
 app.post("/api/products", async (req, res) => {
-    try {
-        const product = await Product.create(req.body);
-        res.status(201).json(product);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to add product" });
+  try {
+    const { name, price, category, image, description } = req.body;
+
+    if (!name || price === undefined || !category) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, price and category are required",
+      });
     }
+
+    const product = await Product.create({
+      name,
+      price: Number(price),
+      category,
+      image: image || "",
+      description: description || "",
+    });
+
+    res.status(201).json({
+      success: true,
+      product,
+    });
+  } catch (error) {
+    console.error("ADD PRODUCT ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to add product",
+    });
+  }
 });
 
-// Admin route - also accepts product creation
-app.post("/api/admin/products", async (req, res) => {
-    try {
-        const product = await Product.create(req.body);
-        res.status(201).json(product);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to add product" });
+// ===============================
+// UPDATE PRODUCT
+// ===============================
+
+app.put("/api/products/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        name: req.body.name,
+        price: Number(req.body.price),
+        category: req.body.category,
+        image: req.body.image || "",
+        description: req.body.description || "",
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
     }
+
+    res.json({
+      success: true,
+      product: updatedProduct,
+    });
+  } catch (error) {
+    console.error("UPDATE PRODUCT ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to update product",
+    });
+  }
 });
 
-// Delete product
+// ===============================
+// DELETE PRODUCT
+// ===============================
+
 app.delete("/api/products/:id", async (req, res) => {
-    try {
-        await Product.findByIdAndDelete(req.params.id);
-        res.json({ success: true });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to delete product" });
+  try {
+    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+
+    if (!deletedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
     }
+
+    res.json({
+      success: true,
+      message: "Product deleted",
+    });
+  } catch (error) {
+    console.error("DELETE PRODUCT ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete product",
+    });
+  }
 });
 
-// Serve website files
+// ===============================
+// HEALTH CHECK
+// ===============================
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    success: true,
+    message: "ADJIAH iPhones API is running",
+  });
+});
+
+// ===============================
+// SERVE WEBSITE
+// ===============================
+
 app.use(express.static(path.join(__dirname, "src")));
 
 app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "src", "index.html"));
+  res.sendFile(path.join(__dirname, "src", "index.html"));
 });
 
-// Start server
+// ===============================
+// START SERVER
+// ===============================
+
 const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
