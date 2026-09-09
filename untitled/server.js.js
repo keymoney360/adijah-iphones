@@ -1,47 +1,52 @@
 const express = require('express');
-const path = require('path');
+const mongoose = require('mongoose');
 const cors = require('cors');
-const fs = require('fs');
+const path = require('path');
+
 const app = express();
-const PORT = process.env.PORT || 10000;
-
 app.use(cors());
-app.use(express.json({limit: '10mb'}));
+app.use(express.json({ limit: '10mb' })); // allow big images
+mongodb+srv://kimaniiangithua_db_user:<db_password>@cluster0.zfamvdh.mongodb.net/?appName=Cluster0
+// 1. CONNECT TO YOUR MONGODB
+const MONGODB_URI = process.env.MONGODB_URI || "PASTE_YOUR_MONGODB_STRING_HERE";
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.error("❌ MongoDB Error:", err));
 
-const distPath = path.join(__dirname, 'dist');
-app.use(express.static(distPath));
+// 2. PRODUCT MODEL
+const ProductSchema = new mongoose.Schema({
+  name: String,
+  price: Number,
+  category: String,
+  image: String,
+  description: String
+}, { timestamps: true });
 
-const productsFile = path.join(__dirname, 'products.json');
-if (!fs.existsSync(productsFile)) {
-  fs.writeFileSync(productsFile, JSON.stringify([
-    {id:1,name:"iPhone 15 Pro Max 256GB",price:185000,category:"iphones",image:"https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=500"},
-    {id:2,name:"iPhone 15 Pro 128GB",price:165000,category:"iphones",image:"https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500"},
-    {id:3,name:"iPad Pro 12.9",price:145000,category:"tablets",image:"https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500"}
-  ], null, 2));
-}
+const Product = mongoose.model('Product', ProductSchema);
 
-app.get('/api/products', (req,res)=>{
-  try{ res.json(JSON.parse(fs.readFileSync(productsFile,'utf8'))); }
-  catch(e){ res.json([]); }
+// 3. API ROUTES
+app.get('/api/products', async (req, res) => {
+  const products = await Product.find().sort({ createdAt: -1 });
+  res.json(products);
 });
 
-app.post('/api/products', (req,res)=>{
-  fs.writeFileSync(productsFile, JSON.stringify(req.body, null, 2));
-  res.json({success:true});
+app.post('/api/products', async (req, res) => {
+  const product = await Product.create(req.body);
+  res.json(product);
 });
 
-// FIX FOR /dist/ error - redirect to /
-app.get('/dist', (req,res)=> res.redirect('/'));
-app.get('/dist/', (req,res)=> res.redirect('/'));
-
-// Admin routes
-app.get('/admin', (req,res)=> res.sendFile(path.join(distPath,'admin.html')));
-app.get('/admin.html', (req,res)=> res.sendFile(path.join(distPath,'admin.html')));
-app.get('/dist/admin.html', (req,res)=> res.sendFile(path.join(distPath,'admin.html')));
-
-app.get('*', (req,res)=> {
-  if(req.path.startsWith('/api/')) return res.status(404).json({error:'Not found'});
-  res.sendFile(path.join(distPath,'index.html'));
+app.delete('/api/products/:id', async (req, res) => {
+  await Product.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
 });
 
-app.listen(PORT, ()=> console.log('ADIJAH LIVE on '+PORT));
+// 4. SERVE YOUR FRONTEND (your current HTML)
+app.use(express.static(path.join(__dirname)));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// 5. START SERVER
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
