@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://adijah-iphones-api.onrender.com/sitemap.xml
