@@ -1,52 +1,93 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const path = require('path');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const path = require("path");
 
 const app = express();
+
 app.use(cors());
-app.use(express.json({ limit: '10mb' })); // allow big images
-mongodb+srv://kimaniiangithua_db_user:<db_password>@cluster0.zfamvdh.mongodb.net/?appName=Cluster0
-// 1. CONNECT TO YOUR MONGODB
-const MONGODB_URI = process.env.MONGODB_URI || "PASTE_YOUR_MONGODB_STRING_HERE";
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ MongoDB Error:", err));
+app.use(express.json({ limit: "10mb" }));
 
-// 2. PRODUCT MODEL
-const ProductSchema = new mongoose.Schema({
-  name: String,
-  price: Number,
-  category: String,
-  image: String,
-  description: String
-}, { timestamps: true });
+// MongoDB connection
+const MONGODB_URI = process.env.MONGODB_URI;
 
-const Product = mongoose.model('Product', ProductSchema);
+if (!MONGODB_URI) {
+    console.error("❌ MONGODB_URI is not configured");
+} else {
+    mongoose
+        .connect(MONGODB_URI)
+        .then(() => console.log("✅ MongoDB Connected"))
+        .catch((err) => console.error("❌ MongoDB Error:", err));
+}
 
-// 3. API ROUTES
-app.get('/api/products', async (req, res) => {
-  const products = await Product.find().sort({ createdAt: -1 });
-  res.json(products);
+// Product model
+const ProductSchema = new mongoose.Schema(
+    {
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        category: { type: String, default: "" },
+        image: { type: String, default: "" },
+        description: { type: String, default: "" }
+    },
+    { timestamps: true }
+);
+
+const Product = mongoose.model("Product", ProductSchema);
+
+// Get all products
+app.get("/api/products", async (req, res) => {
+    try {
+        const products = await Product.find().sort({ createdAt: -1 });
+        res.json(products);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to load products" });
+    }
 });
 
-app.post('/api/products', async (req, res) => {
-  const product = await Product.create(req.body);
-  res.json(product);
+// Add product
+app.post("/api/products", async (req, res) => {
+    try {
+        const product = await Product.create(req.body);
+        res.status(201).json(product);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to add product" });
+    }
 });
 
-app.delete('/api/products/:id', async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
+// Admin route - also accepts product creation
+app.post("/api/admin/products", async (req, res) => {
+    try {
+        const product = await Product.create(req.body);
+        res.status(201).json(product);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to add product" });
+    }
 });
 
-// 4. SERVE YOUR FRONTEND (your current HTML)
-app.use(express.static(path.join(__dirname)));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// Delete product
+app.delete("/api/products/:id", async (req, res) => {
+    try {
+        await Product.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to delete product" });
+    }
 });
 
-// 5. START SERVER
+// Serve website files
+app.use(express.static(path.join(__dirname, "src")));
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "src", "index.html"));
+});
+
+// Start server
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.listen(PORT, () => {
+    console.log(`✅ Server running on port ${PORT}`);
+});
