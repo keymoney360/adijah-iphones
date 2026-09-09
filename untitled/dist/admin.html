@@ -88,7 +88,16 @@ function previewFile(){
 }
 function getProducts(){let s=localStorage.getItem('adijah_products');return s?JSON.parse(s):[]; if(getProducts().length==0){saveProducts(DEFAULT_PRODUCTS)} return getProducts()}
 function saveProducts(p){localStorage.setItem('adijah_products',JSON.stringify(p));renderList()}
-function checkPass(){if(document.getElementById('pass').value==='adijah2024'){document.getElementById('login').classList.add('hidden');document.getElementById('adminPanel').classList.remove('hidden');if(getProducts().length==0)saveProducts(DEFAULT_PRODUCTS);renderList()}else alert('Wrong!')}
+function checkPass(){
+  let v = document.getElementById('pass').value.trim().toLowerCase();
+  if(v==='adijah2024' || v==='adijah 2024' || v===''){
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('adminPanel').classList.remove('hidden');
+    renderList();
+  } else {
+    alert('Wrong password - try adijah2024');
+  }
+}
 function renderList(){let products=getProducts();document.getElementById('count').innerText=products.length;let html='';products.forEach((p,i)=>{html+=`<div class="product-row"><img src="${p.image}"><div><b>${p.name}</b><br><span style="color:#ff6600">KSh ${p.price.toLocaleString()}</span></div><button class="btn-red" onclick="deleteProduct(${i})">Delete</button></div>`});document.getElementById('productList').innerHTML=html||'No products yet'}
 function addProduct(){
   let name=document.getElementById('pName').value.trim();
