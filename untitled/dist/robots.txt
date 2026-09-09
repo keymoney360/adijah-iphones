@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://mukatsoo-iphones-api.onrender.com/sitemap.xml
+Sitemap: https://mukatsoo-iphones.onrender.com/sitemap.xml
