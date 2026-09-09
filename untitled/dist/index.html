@@ -41,7 +41,7 @@
 </head>
 <body>
   <header>
-    <div class="logo">ADIJAH <span>IPHONES</span></div>
+    <div class="logo">MUKATSOO <span>IPHONES</span></div>
     <nav class="categories">
       <button class="nav-btn active" onclick="filterCategory('all', event)">All Products</button>
       <button class="nav-btn" onclick="filterCategory('iphones', event)">iPhones</button>
@@ -53,7 +53,7 @@
   </header>
 
   <section class="hero">
-    <h1>Welcome to <span>Adijah iPhones</span></h1>
+    <h1>Welcome to <span>Mukatsoo iPhones</span></h1>
     <p>Your ultimate destination for genuine iPhones, Tablets, Watches, and Smartphones.</p>
     <p style="margin-top:10px;color:#25D366;font-size:13px" id="status">● LIVE - Auto Updates</p>
   </section>
@@ -84,7 +84,7 @@
     </div>
   </div>
 
-  <footer><p>&copy; 2026 Adijah iPhones. All Rights Reserved.</p></footer>
+  <footer><p>&copy; 2026 Mukatsoo iPhones. All Rights Reserved.</p></footer>
 
   <script>
     let allProducts = [];
@@ -164,7 +164,7 @@
     async function submitOrder(e) { e.preventDefault(); orderWhatsApp(); }
     function orderWhatsApp(){
       if(!cart || cart.length===0){ alert('Cart is empty! Add an iPhone first.'); return; }
-      let message = "Hello ADIJAH IPHONES! 👋%0A%0AI want to order:%0A%0A";
+      let message = "Hello MUKATSOO IPHONES! 👋%0A%0AI want to order:%0A%0A";
       let total = 0;
       cart.forEach((item, i)=>{
         message += `${i+1}. ${item.name} - KSh ${Number(item.price).toLocaleString()}%0A`;
