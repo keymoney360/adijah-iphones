@@ -2,43 +2,40 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adijah Admin - V2 Upload</title>
+<title>Adijah Admin AUTO LIVE</title>
 <style>
-  :root{--orange:#ff6600;--bg:#121212;--card:#1e1e1e;--border:#333}
-  body{background:var(--bg);color:#fff;font-family:Segoe UI,sans-serif;padding:20px;max-width:900px;margin:auto}
-  h1{color:var(--orange);text-align:center}
- .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:15px 0}
-  input,select{width:100%;padding:12px;margin:8px 0 15px;border-radius:8px;border:1px solid var(--border);background:#000;color:#fff}
-  button{padding:12px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
- .btn-orange{background:var(--orange);color:#000;width:100%}
- .btn-green{background:#25D366;color:#fff;width:100%;margin-top:10px}
- .btn-red{background:#ff3333;color:#fff;padding:6px 12px;font-size:12px}
- .product-row{display:flex;gap:10px;align-items:center;background:#000;padding:10px;border-radius:8px;margin:8px 0}
- .product-row img{width:60px;height:60px;object-fit:cover;border-radius:8px}
-  #preview{width:100%;max-height:200px;object-fit:contain;display:none;border-radius:8px;margin:10px 0;border:1px solid var(--orange)}
-  #exportCode{background:#000;color:#0f0;padding:15px;border-radius:8px;white-space:pre-wrap;word-break:break-all;font-size:11px;max-height:300px;overflow:auto;border:1px solid var(--orange)}
- .hidden{display:none}
+:root{--orange:#ff6600;--bg:#0f0f0f;--card:#1e1e1e;--border:#333}
+body{background:var(--bg);color:#fff;font-family:system-ui;padding:15px;max-width:900px;margin:auto}
+h1{color:var(--orange);text-align:center;margin:10px 0}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin:12px 0}
+input,select{width:100%;padding:12px;margin:8px 0 12px;border-radius:8px;border:1px solid var(--border);background:#000;color:#fff;box-sizing:border-box}
+button{padding:12px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+.btn-orange{background:var(--orange);color:#fff;width:100%}
+.btn-red{background:#ff3333;color:#fff;padding:6px 12px;font-size:12px;border-radius:6px}
+.product-row{display:flex;gap:10px;align-items:center;background:#000;padding:10px;border-radius:8px;margin:8px 0}
+.product-row img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+#preview{width:100%;max-height:200px;object-fit:contain;display:none;border-radius:8px;margin:10px 0;border:1px solid var(--orange)}
+.hidden{display:none}
+#status{color:#25D366;text-align:center;font-weight:bold;margin-top:10px}
 </style>
 </head>
 <body>
-<h1>ADIJAH <span style="color:#ff6600">ADMIN V2</span></h1>
+<h1>ADIJAH <span style="color:#ff6600">ADMIN AUTO</span></h1>
 
 <div id="login" class="panel">
-  <h3>Enter Password</h3>
-  <input type="password" id="pass" placeholder="Password">
+  <h3>Login</h3>
+  <input type="password" id="pass" placeholder="adijah2024">
   <button class="btn-orange" onclick="checkPass()">Login</button>
-  <p style="color:#888;font-size:12px">Default: adijah2024</p>
+  <p style="color:#888;font-size:12px">Password: adijah2024 (or leave empty)</p>
 </div>
 
 <div id="adminPanel" class="hidden">
   <div class="panel">
-    <h3 style="color:var(--orange)">➕ Add New Phone</h3>
+    <h3 style="color:var(--orange)">➕ Add New Phone - AUTO LIVE</h3>
     <label>Phone Name</label>
-    <input type="text" id="pName" placeholder="e.g. iPhone 12 64GB - Clean as New">
-
+    <input type="text" id="pName" placeholder="e.g. iPhone 15 Pro Max 256GB">
     <label>Price KSh</label>
-    <input type="number" id="pPrice" placeholder="e.g. 55000">
-
+    <input type="number" id="pPrice" placeholder="e.g. 185000">
     <label>Category</label>
     <select id="pCat">
       <option value="iphones">iPhones</option>
@@ -46,75 +43,104 @@
       <option value="watches">Watches</option>
       <option value="phones">Other Phones</option>
     </select>
-
-    <label>📸 Upload Real Photo (from Gallery)</label>
+    <label>📸 Upload Photo (under 800KB)</label>
     <input type="file" id="pFile" accept="image/*" onchange="previewFile()">
     <img id="preview">
-
-    <label>Or Paste Image Link (optional if you uploaded)</label>
-    <input type="text" id="pImage" placeholder="https://... leave empty if you uploaded">
-
-    <button class="btn-orange" onclick="addProduct()">✅ Add Phone to Shop</button>
+    <label>Or Paste Image URL</label>
+    <input type="text" id="pImage" placeholder="https://...">
+    <button class="btn-orange" onclick="addProduct()">✅ PUBLISH LIVE NOW</button>
+    <div id="status"></div>
   </div>
 
   <div class="panel">
-    <h3>📱 Current Phones (<span id="count">0</span>)</h3>
-    <div id="productList"></div>
+    <h3>📱 LIVE Shop Products (<span id="count">0</span>)</h3>
+    <div id="productList">Loading...</div>
   </div>
-
-  <div class="panel">
-    <h3 style="color:#25D366">🚀 Publish to Live Website</h3>
-    <p style="color:#aaa;font-size:12px">Note: If you uploaded photos, they are saved as base64 - code will be LONG but works 100%!<br>Better to use small images (<500KB).</p>
-    <button class="btn-green" onclick="generateExport()">Generate Code for GitHub</button>
-    <div id="exportCode">Click Generate...</div>
-    <button class="btn-orange" style="margin-top:10px" onclick="copyCode()">📋 Copy Code</button>
-    <a href="/" target="_blank"><button class="btn-green" style="background:#555">👀 View Shop</button></a>
-  </div>
+  <a href="./" target="_blank"><button class="btn-orange" style="background:#333">👀 View Live Shop</button></a>
 </div>
 
 <script>
-const DEFAULT_PRODUCTS = [
-  { id: 1, name: "iPhone 15 Pro Max 256GB", price: 185000, category: "iphones", image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500" },
-  { id: 2, name: "iPhone 15 Pro 128GB", price: 165000, category: "iphones", image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500" }
-];
+const API = '/api/products';
 let uploadedBase64 = "";
+
 function previewFile(){
-  let file = document.getElementById('pFile').files[0];
+  const file = document.getElementById('pFile').files[0];
   if(!file) return;
-  if(file.size > 800000){ alert('Image too big! Use image under 800KB. Please compress or use small photo.'); return; }
-  let reader = new FileReader();
-  reader.onload = function(e){ uploadedBase64 = e.target.result; document.getElementById('preview').src = e.target.result; document.getElementById('preview').style.display='block'; }
+  if(file.size > 800000){ alert('Image too big! Use <800KB. Compress photo.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    uploadedBase64 = e.target.result;
+    const img = document.getElementById('preview');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
   reader.readAsDataURL(file);
 }
-function getProducts(){let s=localStorage.getItem('adijah_products');return s?JSON.parse(s):[]; if(getProducts().length==0){saveProducts(DEFAULT_PRODUCTS)} return getProducts()}
-function saveProducts(p){localStorage.setItem('adijah_products',JSON.stringify(p));renderList()}
+
 function checkPass(){
-  let v = document.getElementById('pass').value.trim().toLowerCase();
-  if(v==='adijah2024' || v==='adijah 2024' || v===''){
-    document.getElementById('login').classList.add('hidden');
-    document.getElementById('adminPanel').classList.remove('hidden');
-    renderList();
-  } else {
-    alert('Wrong password - try adijah2024');
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('adminPanel').classList.remove('hidden');
+  renderList();
+}
+
+async function getProducts(){
+  try{
+    const res = await fetch(API);
+    return await res.json();
+  }catch(e){
+    return [];
   }
 }
-function renderList(){let products=getProducts();document.getElementById('count').innerText=products.length;let html='';products.forEach((p,i)=>{html+=`<div class="product-row"><img src="${p.image}"><div><b>${p.name}</b><br><span style="color:#ff6600">KSh ${p.price.toLocaleString()}</span></div><button class="btn-red" onclick="deleteProduct(${i})">Delete</button></div>`});document.getElementById('productList').innerHTML=html||'No products yet'}
-function addProduct(){
-  let name=document.getElementById('pName').value.trim();
-  let price=parseInt(document.getElementById('pPrice').value);
-  let cat=document.getElementById('pCat').value;
-  let link=document.getElementById('pImage').value.trim();
-  let finalImage = uploadedBase64 || link || "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500";
-  if(!name||!price){alert('Enter Name & Price');return}
-  let products=getProducts();
-  products.unshift({id:Date.now(),name,price,category:cat,image:finalImage});
-  saveProducts(products);
-  document.getElementById('pName').value='';document.getElementById('pPrice').value='';document.getElementById('pImage').value='';document.getElementById('pFile').value='';document.getElementById('preview').style.display='none';uploadedBase64='';
-  alert('Added! Now Generate Code to publish.');
+
+async function saveProducts(products){
+  await fetch(API, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(products)
+  });
+  renderList();
 }
-function deleteProduct(i){if(!confirm('Delete?'))return;let p=getProducts();p.splice(i,1);saveProducts(p)}
-function generateExport(){let products=getProducts();let code="allProducts = [\n";products.forEach(pr=>{let img=pr.image; if(img.startsWith('data:')){img=img.substring(0,100)+'...TRUNCATED...Use real link for production!'} code+=` { id: ${pr.id}, name: "${pr.name.replace(/"/g,'\\"')}", price: ${pr.price}, category: "${pr.category}", image: "${pr.image.replace(/"/g,'\\"')}" },\n`});code+="];\nrenderProducts(allProducts);";document.getElementById('exportCode').innerText=code}
-function copyCode(){navigator.clipboard.writeText(document.getElementById('exportCode').innerText).then(()=>alert('Copied! Paste in GitHub index.html'))}
+
+async function renderList(){
+  const products = await getProducts();
+  document.getElementById('count').innerText = products.length;
+  let html = '';
+  products.forEach((p,i)=>{
+    html += `<div class="product-row">
+      <img src="${p.image}" onerror="this.src='https://via.placeholder.com/60'">
+      <div style="flex:1"><b>${p.name}</b><br><span style="color:var(--orange)">KSh ${Number(p.price).toLocaleString()}</span><br><small>${p.category}</small></div>
+      <button class="btn-red" onclick="deleteProduct(${i})">X</button>
+    </div>`;
+  });
+  document.getElementById('productList').innerHTML = html || 'No products yet';
+}
+
+async function addProduct(){
+  const name = document.getElementById('pName').value.trim();
+  const price = parseInt(document.getElementById('pPrice').value);
+  const cat = document.getElementById('pCat').value;
+  const link = document.getElementById('pImage').value.trim();
+  const finalImage = uploadedBase64 || link || "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500";
+  if(!name ||!price){ alert('Enter Name & Price'); return; }
+  document.getElementById('status').innerText = 'Publishing LIVE...';
+  const products = await getProducts();
+  products.unshift({ id: Date.now(), name, price, category: cat, image: finalImage });
+  await saveProducts(products);
+  document.getElementById('status').innerText = '✅ LIVE! Customer can see it now!';
+  document.getElementById('pName').value=''; document.getElementById('pPrice').value='';
+  document.getElementById('pImage').value=''; document.getElementById('pFile').value='';
+  document.getElementById('preview').style.display='none'; uploadedBase64='';
+  setTimeout(()=>document.getElementById('status').innerText='',3000);
+}
+
+async function deleteProduct(i){
+  if(!confirm('Delete from LIVE shop?')) return;
+  const products = await getProducts();
+  products.splice(i,1);
+  await saveProducts(products);
+}
+
+renderList();
 </script>
 </body>
 </html>
